@@ -20,6 +20,7 @@
 *.sublime-workspace
 
 # misc
+dev-db
 /.sass-cache
 /connect.lock
 /coverage
