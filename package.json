@@ -2,8 +2,9 @@
   "name": "@widgets-r-us/model",
   "author": "ajmed",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.1.11",
   "description": "",
+  "main": "models.js",
   "scripts": {
     "test": "nodeunit spec",
     "start:dev-db": "start-dev-db.sh"
@@ -11,7 +12,7 @@
   "dependencies": {
     "mongoose": "^4.13.7",
     "mongoose-paginate": "^5.0.3",
-    "node-uuid": "^1.4.8"
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "mongodb-server": "^1.0.0",

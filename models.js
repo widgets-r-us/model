@@ -1,4 +1,4 @@
-var uuid = require('node-uuid')
+var uuid = require('uuid')
 var mongoose = require('mongoose')
 var mongoosePaginate = require('mongoose-paginate')
 var Schema = mongoose.Schema
@@ -170,37 +170,39 @@ var OrderProductSchema = new Schema({
 
 WidgetSchema.plugin(mongoosePaginate)
 
-const widgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
-const widgetType = mongoose.model('WidgetType', WidgetTypeSchema)
-const widgetFinish = mongoose.model('WidgetFinish', WidgetFinishSchema)
-const widgetSize = mongoose.model('WidgetSize', WidgetSizeSchema)
-const widget = mongoose.model('Widget', WidgetSchema)
-const customWidgetAttribute = mongoose.model('CustomWidgetAttribute', CustomWidgetAttributeSchema)
-const customWidgetAttributeWidget = mongoose.model('CustomWidgetAttributeWidget', CustomWidgetAttributeWidgetSchema)
-const customWidgetCategory = mongoose.model('CustomWidgetCategory', CustomWidgetCategorySchema)
-const customWidgetCategoryOption = mongoose.model('CustomWidgetCategoryOption', CustomWidgetCategoryOptionSchema)
-const customWidgetCategoryOptionWidget = mongoose.model('CustomWidgetCategoryOptionWidget', CustomWidgetCategoryOptionWidgetSchema)
-const widgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
-const product = mongoose.model('Product', ProductSchema)
-const order = mongoose.model('Order', OrderSchema)
-const orderProduct = mongoose.model('OrderProduct', OrderProductSchema)
+const WidgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
+const WidgetType = mongoose.model('WidgetType', WidgetTypeSchema)
+const WidgetFinish = mongoose.model('WidgetFinish', WidgetFinishSchema)
+const WidgetSize = mongoose.model('WidgetSize', WidgetSizeSchema)
+const Widget = mongoose.model('Widget', WidgetSchema)
+const CustomWidgetAttribute = mongoose.model('CustomWidgetAttribute', CustomWidgetAttributeSchema)
+const CustomWidgetAttributeWidget = mongoose.model('CustomWidgetAttributeWidget', CustomWidgetAttributeWidgetSchema)
+const CustomWidgetCategory = mongoose.model('CustomWidgetCategory', CustomWidgetCategorySchema)
+const CustomWidgetCategoryOption = mongoose.model('CustomWidgetCategoryOption', CustomWidgetCategoryOptionSchema)
+const CustomWidgetCategoryOptionWidget = mongoose.model('CustomWidgetCategoryOptionWidget', CustomWidgetCategoryOptionWidgetSchema)
+const WidgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
+const Product = mongoose.model('Product', ProductSchema)
+const Order = mongoose.model('Order', OrderSchema)
+const OrderProduct = mongoose.model('OrderProduct', OrderProductSchema)
 
 // TODO(ajmed): Verify mongoose does cascading deletes (like when deleting an order, it's also removed from
 // the OrderProduct table
 
-module.exports = {
-  WidgetsRUsError: widgetsRUsError,
-  WidgetType: widgetType,
-  WidgetFinish: widgetFinish,
-  WidgetSize: widgetSize,
-  Widget: widget,
-  CustomWidgetAttribute: customWidgetAttribute,
-  CustomWidgetAttributeWidget: customWidgetAttributeWidget,
-  CustomWidgetCategory: customWidgetCategory,
-  CustomWidgetCategoryOption: customWidgetCategoryOption,
-  CustomWidgetCategoryOptionWidget: customWidgetCategoryOptionWidget,
-  WidgetsRUsUser: widgetsRUsUser,
-  Product: product,
-  Order: order,
-  OrderProduct: orderProduct
+module.exports = exports = {
+  WidgetsRUsError: WidgetsRUsError,
+  WidgetType: WidgetType,
+  WidgetFinish: WidgetFinish,
+  WidgetSize: WidgetSize,
+  Widget: Widget,
+  CustomWidgetAttribute: CustomWidgetAttribute,
+  CustomWidgetAttributeWidget: CustomWidgetAttributeWidget,
+  CustomWidgetCategory: CustomWidgetCategory,
+  CustomWidgetCategoryOption: CustomWidgetCategoryOption,
+  CustomWidgetCategoryOptionWidget: CustomWidgetCategoryOptionWidget,
+  WidgetsRUsUser: WidgetsRUsUser,
+  Product: Product,
+  Order: Order,
+  OrderProduct: OrderProduct
 }
+
+
