@@ -1,11 +1,11 @@
 module.exports = {
   setUp: function (callback) {
-    // setup
+    // setup test database connection
     this.foo = 'bar'
     callback()
   },
   tearDown: function(callback) {
-    // cleanup
+    // cleanup test database connection
     callback()
   },
   testModel: function(test) {
