@@ -13,11 +13,12 @@ var Schema = mongoose.Schema
  * - Key/Column names:
  * -- are singular
  * -- are camelCase
- * - Junction tables are a simple combination of both table names appended one after another in alphabetical order.
- * -- For example, Product table & Order table = OrderProduct table
- * - Names should be descriptive to avoid collision in the future. For example, the WidgetType table could have been
- *   named Types, but Types is a very general word that could likely be used for some notion of Types in the future. To
- *   avoid that, we prepend the table name with Widget because it is, indeed, a WidgetType.
+ * - Junction tables are a combination of both table names appended one after another in alphabetical order, separated by an X.
+ * -- Example, junction table between Product & Order = OrderXProduct
+ * - Names should be descriptive to avoid collision in the future. Instead of naming the WidgetAttribute just
+ * Attribute, we name it WidgetAttribute. If, later, we figure out it really is just an Attribute that can apply to
+ * more than just widgets, we can handle it then. It's better to start with a more limited scope and have to make it
+ * broader than making a broad scope and having it collide with something else.
  * -- Don't worry too much about table name length. Brevity is nice, but if we can't accomplish this while also being
  *    descriptive, we shouldn't mind a longer name.
  */
@@ -39,91 +40,66 @@ var WidgetsRUsErrorSchema = new Schema({
 }, {timestamps: true})
 
 /**
- * @key widgetType: String - represents the type a widget is. Examples include Prime, Elite, Extreme Edition, etc.
- */
-var WidgetTypeSchema = new Schema({
-  widgetType: String
-})
-
-/**
- * @key widgetFinish: String - represents the finish a widget has. Examples include Wood, Chrome, Matte, etc.
- */
-var WidgetFinishSchema = new Schema({
-  widgetFinish: String
-})
-
-/**
- * @key widgetSize: String - represents the size of a widget. Examples include Infinitesimal, Galactically Huge.
- */
-var WidgetSizeSchema = new Schema({
-  widgetSize: String
-})
-
-/**
  * @key _id: String - A UUID (universally unique identifier) for each widget. This will allow a widget to be
  *        loosely coupled to the Products table. I don't want widgets to inherently have a quantity or price, and I
  *        don't want to require a Product be a widget. As such, a widget will have a UUID which the products table
  *        can reference. That way, in the future, a product can be anything that has a UUID as its 'primary key,' and
  *        not only a widget.
  * @key name: String - represents the name of this widget, generally a combination of its type, finish, and size.
- * @key widgetTypeId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetType table.
- * @key widgetFinishId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetFinish table.
- * @key widgetSizeId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetSize table.
  */
 var WidgetSchema = new Schema({
-  _id: {type: String, default: uuid.v1 },
-  name: String,
-  widgetTypeId: {type: Schema.Types.ObjectId, ref: 'WidgetType'},
-  widgetFinishId: {type: Schema.Types.ObjectId, ref: 'WidgetFinish'},
-  widgetSizeId: {type: Schema.Types.ObjectId, ref: 'WidgetSize'},
+  _id: {type: String, default: uuid },
+  name: String
 })
 
 /**
- * @key customWidgetAttribute: String - represents a user-defined widget attribute. Examples include 'Haunted' or
+ * @key widgetAttribute: String - represents a user-defined widget attribute. Examples include 'Haunted' or
  *        'Crawling with critters.'
  */
-var CustomWidgetAttributeSchema = new Schema({
-  customWidgetAttribute: String
+var WidgetAttributeSchema = new Schema({
+  widgetAttribute: String
 })
 
 /**
- * This is a junction table joining CustomWidgetAttribute to Widget because Widget can have many CustomAttributes,
- * and CustomAttributes can be attached to many Widget.
+ * This is a junction table joining WidgetAttribute to Widget because Widget can have many Attributes,
+ * and Attributes can be attached to many Widget.
  *
- * @key customWidgetAttributeId: Mongoose.Schema.Types.ObjectId - foreign key to CustomWidgetAttribute table.
+ * @key widgetAttributeId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetAttribute table.
  * @key widgetId: Mongoose.Schema.Types.ObjectId - foreign key to Widget table.
  */
-var CustomWidgetAttributeWidgetSchema = new Schema({
-  customWidgetAttributeId: {type: Schema.Types.ObjectId, ref: 'CustomWidgetAttribute'},
+var WidgetXWidgetAttributeSchema = new Schema({
   widgetId: {type: Schema.Types.ObjectId, ref: 'Widget'},
+  widgetAttributeId: {type: Schema.Types.ObjectId, ref: 'WidgetAttribute'},
 })
 
 /**
- * @key customWidgetCategory: String - represents the custom widget category. Examples include Scent or Texture.
+ * @key widgetCategory: String - represents the widget category. Examples include Size, Finish, Type, Texture, etc.
  */
-var CustomWidgetCategorySchema = new Schema({
-  customWidgetCategory: String
+var WidgetCategorySchema = new Schema({
+  widgetCategory: String
 })
 
 /**
- * @key customWidgetCategoryId: Mongoose.Schema.Types.ObjectId - foreign key to CustomWidgetCategory table.
- * @key customWidgetCategoryOption: String - represents an option for the custom widget category. Examples include:
- *        let customWidgetCategory = scent, customWidgetCategoryOption might be sweet, fruity, pungent, musky.
+ * @key widgetCategoryId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategory table.
+ * @key widgetCategoryOption: String - represents an option for the widget category. Examples include:
+ *        let widgetCategory = scent, widgetCategoryOption might be sweet, fruity, pungent, musky.
  */
-var CustomWidgetCategoryOptionSchema = new Schema({
-  customWidgetCategoryId: {type: Schema.Types.ObjectId, ref: 'CustomWidgetCategory'},
-  customWidgetCategoryOption: String
+var WidgetCategoryOptionSchema = new Schema({
+  widgetCategoryId: {type: Schema.Types.ObjectId, ref: 'WidgetCategory'},
+  widgetCategoryOption: String
 })
 
 /**
- * This schema represents a junction table between a custom widget category option and a widget.
+ * This schema represents a junction table between a widget category option and a widget. We
+ * can recover the category by looking up the widgetCategoryOptionId in the WidgetCategoryOption table
+ * and following the associated widgetCategoryId.
  *
- * @key customWidgetCategoryOptionId: Mongoose.Schema.Types.ObjectId - foreign key to CustomWidgetCategoryOption table.
  * @key widgetsId: Mongoose.Schema.Types.ObjectId - foreign key to Widget table.
+ * @key widgetCategoryOptionId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategoryOption table.
  */
-var CustomWidgetCategoryOptionWidgetSchema = new Schema({
-  customWidgetCategoryOptionId: {type: Schema.Types.ObjectId, ref: 'CustomWidgetCategoryOption'},
+var WidgetXWidgetCategoryOptionSchema = new Schema({
   widgetId: {type: Schema.Types.ObjectId, ref: 'Widget'},
+  widgetCategoryOptionId: {type: Schema.Types.ObjectId, ref: 'WidgetCategoryOption'},
 })
 
 /**
@@ -162,7 +138,7 @@ var ProductSchema = new Schema({
  * @key orderId: Mongoose.Schema.Types.ObjectId - foreign key to Product table.
  * @key quantityToBuy: Number - number of specified products in this order.
  */
-var OrderProductSchema = new Schema({
+var OrderXProductSchema = new Schema({
   orderId: {type: Schema.Types.ObjectId, ref: 'Order'},
   productId: {type: Schema.Types.ObjectId, ref: 'Product'},
   quantityToBuy: Number
@@ -170,39 +146,31 @@ var OrderProductSchema = new Schema({
 
 WidgetSchema.plugin(mongoosePaginate)
 
-const WidgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
-const WidgetType = mongoose.model('WidgetType', WidgetTypeSchema)
-const WidgetFinish = mongoose.model('WidgetFinish', WidgetFinishSchema)
-const WidgetSize = mongoose.model('WidgetSize', WidgetSizeSchema)
-const Widget = mongoose.model('Widget', WidgetSchema)
-const CustomWidgetAttribute = mongoose.model('CustomWidgetAttribute', CustomWidgetAttributeSchema)
-const CustomWidgetAttributeWidget = mongoose.model('CustomWidgetAttributeWidget', CustomWidgetAttributeWidgetSchema)
-const CustomWidgetCategory = mongoose.model('CustomWidgetCategory', CustomWidgetCategorySchema)
-const CustomWidgetCategoryOption = mongoose.model('CustomWidgetCategoryOption', CustomWidgetCategoryOptionSchema)
-const CustomWidgetCategoryOptionWidget = mongoose.model('CustomWidgetCategoryOptionWidget', CustomWidgetCategoryOptionWidgetSchema)
-const WidgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
-const Product = mongoose.model('Product', ProductSchema)
-const Order = mongoose.model('Order', OrderSchema)
-const OrderProduct = mongoose.model('OrderProduct', OrderProductSchema)
+const widgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
+const widget = mongoose.model('Widget', WidgetSchema)
+const widgetAttribute = mongoose.model('WidgetAttribute', WidgetAttributeSchema)
+const widgetXWidgetAttribute = mongoose.model('WidgetXWidgetAttribute', WidgetXWidgetAttributeSchema)
+const widgetCategory = mongoose.model('WidgetCategory', WidgetCategorySchema)
+const widgetCategoryOption = mongoose.model('WidgetCategoryOption', WidgetCategoryOptionSchema)
+const widgetXWidgetCategoryOption = mongoose.model('WidgetXWidgetCategoryOption', WidgetXWidgetCategoryOptionSchema)
+const widgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
+const product = mongoose.model('Product', ProductSchema)
+const order = mongoose.model('Order', OrderSchema)
+const orderXProduct = mongoose.model('OrderXProduct', OrderXProductSchema)
 
 // TODO(ajmed): Verify mongoose does cascading deletes (like when deleting an order, it's also removed from
 // the OrderProduct table
 
-module.exports = exports = {
-  WidgetsRUsError: WidgetsRUsError,
-  WidgetType: WidgetType,
-  WidgetFinish: WidgetFinish,
-  WidgetSize: WidgetSize,
-  Widget: Widget,
-  CustomWidgetAttribute: CustomWidgetAttribute,
-  CustomWidgetAttributeWidget: CustomWidgetAttributeWidget,
-  CustomWidgetCategory: CustomWidgetCategory,
-  CustomWidgetCategoryOption: CustomWidgetCategoryOption,
-  CustomWidgetCategoryOptionWidget: CustomWidgetCategoryOptionWidget,
-  WidgetsRUsUser: WidgetsRUsUser,
-  Product: Product,
-  Order: Order,
-  OrderProduct: OrderProduct
+module.exports = {
+  WidgetsRUsError: widgetsRUsError,
+  Widget: widget,
+  WidgetAttribute: widgetAttribute,
+  WidgetXWidgetAttribute: widgetXWidgetAttribute,
+  WidgetCategory: widgetCategory,
+  WidgetCategoryOption: widgetCategoryOption,
+  WidgetXWidgetCategoryOption: widgetXWidgetCategoryOption,
+  WidgetsRUsUser: widgetsRUsUser,
+  Product: product,
+  Order: order,
+  OrderXProduct: orderXProduct
 }
-
-
