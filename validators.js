@@ -25,7 +25,21 @@ const WidgetsRUsUserValidator = {
   }
 }
 
+const OrderValidator = {
+  validate: function(order) {
+
+  }
+}
+
+const ProductValidator = {
+  validate: function(product) {
+
+  }
+}
+
 module.exports = {
   WidgetValidator: WidgetValidator,
-  WidgetsRUsUserValidator: WidgetsRUsUserValidator
+  WidgetsRUsUserValidator: WidgetsRUsUserValidator,
+  OrderValidator: OrderValidator,
+  ProductValidator: ProductValidator
 }

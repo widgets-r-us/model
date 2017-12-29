@@ -2,6 +2,7 @@ var uuid = require('uuid')
 var mongoose = require('mongoose')
 var mongoosePaginate = require('mongoose-paginate')
 var Schema = mongoose.Schema
+var validators = require('validators')
 
 /**
  * Naming conventions:
@@ -172,5 +173,7 @@ module.exports = {
   WidgetsRUsUser: widgetsRUsUser,
   Product: product,
   Order: order,
-  OrderXProduct: orderXProduct
+  OrderXProduct: orderXProduct,
+
+  Validators: validators
 }
