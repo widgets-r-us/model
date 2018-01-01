@@ -3,7 +3,7 @@ var ValidatorJs = require('validator')
 // TODO(ajmed): a validate call should check that all fields exist and are valid.
 // TODO(ajmed): a validateSubset call should only validate the passed in fields.
 
-const basicTextRegex = /^[A-z0-9~`!@#$%^&*()_+=:,?\/-]$/
+const basicTextRegex = /^[A-z0-9~`!@#$%^&*()_+=:,?-]$/
 const usernameRegex = /^[A-z0-9_-]{3,15}$/
 
 const WidgetValidator = {

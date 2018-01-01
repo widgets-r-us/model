@@ -2,7 +2,7 @@ var uuid = require('uuid')
 var mongoose = require('mongoose')
 var mongoosePaginate = require('mongoose-paginate')
 var Schema = mongoose.Schema
-var validators = require('validators')
+var Validators = require('validators')
 
 /**
  * Naming conventions:
@@ -74,26 +74,30 @@ var WidgetXWidgetAttributeSchema = new Schema({
 })
 
 /**
+ * @key parentId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategory table. Think of this field
+ *        as the parent of this category.
  * @key widgetCategory: String - represents the widget category. Examples include Size, Finish, Type, Texture, etc.
  */
 var WidgetCategorySchema = new Schema({
+  parentId: {type: Schema.Types.ObjectId, ref: 'WidgetCategory'},
   widgetCategory: String
 })
 
 /**
- * @key widgetCategoryId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategory table.
+ * @key parentId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategory table. Think of this field
+ *        as the parent of this option.
  * @key widgetCategoryOption: String - represents an option for the widget category. Examples include:
  *        let widgetCategory = scent, widgetCategoryOption might be sweet, fruity, pungent, musky.
  */
 var WidgetCategoryOptionSchema = new Schema({
-  widgetCategoryId: {type: Schema.Types.ObjectId, ref: 'WidgetCategory'},
+  parentId: {type: Schema.Types.ObjectId, ref: 'WidgetCategory'},
   widgetCategoryOption: String
 })
 
 /**
  * This schema represents a junction table between a widget category option and a widget. We
  * can recover the category by looking up the widgetCategoryOptionId in the WidgetCategoryOption table
- * and following the associated widgetCategoryId.
+ * and following the associated parentId.
  *
  * @key widgetsId: Mongoose.Schema.Types.ObjectId - foreign key to Widget table.
  * @key widgetCategoryOptionId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategoryOption table.
@@ -145,35 +149,71 @@ var OrderXProductSchema = new Schema({
   quantityToBuy: Number
 })
 
+
+const WidgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
+const Widget = mongoose.model('Widget', WidgetSchema)
+const WidgetAttribute = mongoose.model('WidgetAttribute', WidgetAttributeSchema)
+const WidgetXWidgetAttribute = mongoose.model('WidgetXWidgetAttribute', WidgetXWidgetAttributeSchema)
+const WidgetCategory = mongoose.model('WidgetCategory', WidgetCategorySchema)
+const WidgetCategoryOption = mongoose.model('WidgetCategoryOption', WidgetCategoryOptionSchema)
+const WidgetXWidgetCategoryOption = mongoose.model('WidgetXWidgetCategoryOption', WidgetXWidgetCategoryOptionSchema)
+const WidgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
+const Product = mongoose.model('Product', ProductSchema)
+const Order = mongoose.model('Order', OrderSchema)
+const OrderXProduct = mongoose.model('OrderXProduct', OrderXProductSchema)
+
 WidgetSchema.plugin(mongoosePaginate)
 
-const widgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
-const widget = mongoose.model('Widget', WidgetSchema)
-const widgetAttribute = mongoose.model('WidgetAttribute', WidgetAttributeSchema)
-const widgetXWidgetAttribute = mongoose.model('WidgetXWidgetAttribute', WidgetXWidgetAttributeSchema)
-const widgetCategory = mongoose.model('WidgetCategory', WidgetCategorySchema)
-const widgetCategoryOption = mongoose.model('WidgetCategoryOption', WidgetCategoryOptionSchema)
-const widgetXWidgetCategoryOption = mongoose.model('WidgetXWidgetCategoryOption', WidgetXWidgetCategoryOptionSchema)
-const widgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
-const product = mongoose.model('Product', ProductSchema)
-const order = mongoose.model('Order', OrderSchema)
-const orderXProduct = mongoose.model('OrderXProduct', OrderXProductSchema)
+WidgetCategoryOptionSchema.pre('remove', function(next) {
+  WidgetXWidgetCategoryOption.remove({widgetCategoryOptionId: this._id}).exec()
+  next()
+})
+
+// Ensure we have cascading delete functionality (i.e. when a category is deleted
+// the widget is no longer referencing that category).
+WidgetCategorySchema.pre('remove', function(next) {
+  WidgetCategory.remove({parentId: this._id}).exec()
+  WidgetCategoryOption.remove({parentId: this._id}).exec()
+  next()
+})
+
+WidgetAttributeSchema.pre('remove', function(next) {
+  WidgetXWidgetAttribute.remove({widgetAttributeId: this._id}).exec()
+  next()
+})
+
+ProductSchema.pre('remove', function(next) {
+  OrderXProduct.remove({productId: this._id}).exec()
+  next()
+})
+
+WidgetSchema.pre('remove', function(next) {
+  WidgetXWidgetAttribute.remove({widgetId: this._id}).exec()
+  WidgetXWidgetCategoryOption.remove({widgetId: this._id}).exec()
+  Product.remove({merchandiseId: this._id}).exec()
+  next()
+})
+
+WidgetsRUsUserSchema.pre('remove', function(next) {
+  Order.remove({widgetsRUsUserId: this._id}).exec()
+  next()
+})
 
 // TODO(ajmed): Verify mongoose does cascading deletes (like when deleting an order, it's also removed from
 // the OrderProduct table
 
 module.exports = {
-  WidgetsRUsError: widgetsRUsError,
-  Widget: widget,
-  WidgetAttribute: widgetAttribute,
-  WidgetXWidgetAttribute: widgetXWidgetAttribute,
-  WidgetCategory: widgetCategory,
-  WidgetCategoryOption: widgetCategoryOption,
-  WidgetXWidgetCategoryOption: widgetXWidgetCategoryOption,
-  WidgetsRUsUser: widgetsRUsUser,
-  Product: product,
-  Order: order,
-  OrderXProduct: orderXProduct,
+  WidgetsRUsError: WidgetsRUsError,
+  Widget: Widget,
+  WidgetAttribute: WidgetAttribute,
+  WidgetXWidgetAttribute: WidgetXWidgetAttribute,
+  WidgetCategory: WidgetCategory,
+  WidgetCategoryOption: WidgetCategoryOption,
+  WidgetXWidgetCategoryOption: WidgetXWidgetCategoryOption,
+  WidgetsRUsUser: WidgetsRUsUser,
+  Product: Product,
+  Order: Order,
+  OrderXProduct: OrderXProduct,
 
-  Validators: validators
+  Validators: Validators
 }
