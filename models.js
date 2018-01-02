@@ -2,7 +2,7 @@ var uuid = require('uuid')
 var mongoose = require('mongoose')
 var mongoosePaginate = require('mongoose-paginate')
 var Schema = mongoose.Schema
-var Validators = require('validators')
+var Validators = require('./validators')
 
 /**
  * Naming conventions:
@@ -198,9 +198,6 @@ WidgetsRUsUserSchema.pre('remove', function(next) {
   Order.remove({widgetsRUsUserId: this._id}).exec()
   next()
 })
-
-// TODO(ajmed): Verify mongoose does cascading deletes (like when deleting an order, it's also removed from
-// the OrderProduct table
 
 module.exports = {
   WidgetsRUsError: WidgetsRUsError,
