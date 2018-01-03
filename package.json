@@ -7,7 +7,7 @@
   "main": "models.js",
   "scripts": {
     "test": "nodeunit spec",
-    "start:dev-db": "start-dev-db.sh"
+    "start": "start-dev-db.sh"
   },
   "dependencies": {
     "mongoose": "^4.13.7",

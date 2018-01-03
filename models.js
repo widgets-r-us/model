@@ -37,7 +37,7 @@ var WidgetsRUsErrorSchema = new Schema({
   context: String,
   code: String,
   message: String,
-  data: String,
+  data: Schema.Types.Mixed,
 }, {timestamps: true})
 
 /**
