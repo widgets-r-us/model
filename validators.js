@@ -6,8 +6,10 @@ var ValidatorJs = require('validator')
 const basicTextRegex = /^[A-z0-9~`!@#$%^&*()_+=:,?-]$/
 const usernameRegex = /^[A-z0-9_-]{3,15}$/
 
+const pass = 'pass'
+
 const WidgetValidator = {
-  validate: function(widget) {
+  validate: function (widget) {
     if (!widget)
       return 'Failed validation: widget was falsy'
     else if (typeof widget._id === 'undefined' || !ValidatorJs.isMongoId(widget._id))
@@ -15,67 +17,114 @@ const WidgetValidator = {
     else if (typeof widget.name === 'undefined' || !ValidatorJs.isLength(widget.name, {min: 2, max: 256}))
       return 'Failed validation: widget name must be between 2 and 256 characters'
     else if (!widget.name.match(basicTextRegex))
-      return 'Must only contain alphanumeric characters, spaces, and the following special characters: ' +
-          '~, `, !, @, #, $, %, ^, &, *, (, ), _, -, +, =, |, :, ,, ?, /.'
+      return 'Failed validation: must only contain alphanumerics, spaces, and the following special characters: ' +
+          '~, `, !, @, #, $, %, ^, &, *, (, ), _, -, +, =, |, :, ,, ?.'
 
-    return 'pass'
+    return pass
   },
-  validateSubset: function(widget) {
+  validateSubset: function (widget) {
     if (typeof widget._id !== 'undefined' && !ValidatorJs.isMongoId(widget._id))
       return 'Failed validation: invalid widget id'
     else if (typeof widget.name !== 'undefined' && !ValidatorJs.isLength(widget.name, {min: 2, max: 256}))
       return 'Failed validation: widget name must be inclusive-between 2 and 256 characters'
+    else if (typeof widget.name !== 'undefined' && !widget.name.match(basicTextRegex))
+      return 'Failed validation: widget name must only contain alphanumerics, spaces, and the following special characters: ' +
+          '~, `, !, @, #, $, %, ^, &, *, (, ), _, -, +, =, |, :, ,, ?.'
 
-    return 'pass'
+    return pass
   }
 }
 
 const WidgetsRUsUserValidator = {
-  validate: function(widgetsRUsUser) {
-    if (!widgetsRUsUser.username)
+  validate: function (widgetsRUsUser) {
+    if (!widgetsRUsUser)
+      return 'Failed validation: Widgets R Us user was falsy'
+    else if (typeof widgetsRUsUser.username === 'undefined' || !widgetsRUsUser.username)
       return 'Failed validation: username was falsy'
     else if (!widgetsRUsUser.username.match(usernameRegex))
       return 'Failed validation: Invalid username, must be between 3 & 15 characters and may contain only letters, numbers, and hyphens'
 
-    return 'pass'
+    return pass
   },
-  validateSubset: function() {
-
+  validateSubset: function () {
+    return pass
   }
 }
 
 const OrderValidator = {
-  validate: function(order) {
-
+  validate: function (order) {
+    return pass
   },
-  validateSubset: function() {
-
-  }
-}
-
-const BaseValidator = {
-  validate: function(model) {
-    if (!model.matches(/^[A-z0-9\s~`@#$%^&*()_+=:,?\/-]{2,48}$/)) {
-      return 'Must only contain alphanumeric characters, spaces, and the following special characters: ' +
-          '~, `, !, @, #, $, %, ^, &, *, (, ), _, -, +, =, |, :, ,, ?, /.'
-    }
+  validateSubset: function () {
+    return pass
   }
 }
 
 const ProductValidator = {
-  validate: function(model) {
-
+  validate: function (product) {
+    return pass
   },
-  validateSubset: function(model) {
+  validateSubset: function (product) {
+    return pass
+  }
+}
+const WidgetCategoryValidator = {
+  validate: function (widgetCategory) {
+    if (!widgetCategory)
+      return 'Failed validation: widget category was falsy'
+    else if (typeof widgetCategory._id === 'undefined' || !ValidatorJs.isMongoId(widgetCategory._id))
+      return 'Failed validation: invalid widget category id'
+    else if (typeof widgetCategory.widgetCategory === 'undefined' || !widgetCategory.widgetCategory.matches(/^[A-z0-9\s~`@#$%^&*()_+=:,?-]{2,48}$/))
+      return 'Failed validation: must be inclusive-between 2 and 48 and may only contain alphanumerics, spaces, and the following special characters: ' +
+          '~, `, !, @, #, $, %, ^, &, *, (, ), _, -, +, =, |, :, ,, ?.'
 
-  }}
-const WidgetCategoryValidator = {validate: function(model) {}, validateSubset: function(model) {}}
-const WidgetCategoryOptionValidator = {validate: function(model) {}, validateSubset: function(model) {}}
-const WidgetAttributeValidator = {validate: function(model) {}, validateSubset: function(model) {}}
-const WidgetXWidgetAttributeValidator = {validate: function(model) {}, validateSubset: function(model) {}}
-const WidgetXWidgetCategoryOptionValidator = {validate: function(model) {}, validateSubset: function(model) {}}
+    return pass
+  },
+  validateSubset: function (model) {
+    return pass
+  }
+}
+const WidgetCategoryOptionValidator = {
+  validate: function (model) {
+    return pass
+  },
+  validateSubset: function (model) {
+    return pass
+  }
+}
+const WidgetAttributeValidator = {
+  validate: function (model) {
+    return pass
+  },
+  validateSubset: function (model) {
+    return pass
+  }
+}
+const WidgetXWidgetAttributeValidator = {
+  validate: function (model) {
+    return pass
+  },
+  validateSubset: function (model) {
+    return pass
+  }
+}
+const WidgetXWidgetCategoryOptionValidator = {
+  validate: function (model) {
+    return pass
+  },
+  validateSubset: function (model) {
+    return pass
+  }
+}
 // validator validates that these are mongoIds
-const OrderXProductValidator = {validate: function(model) {}, validateSubset: function() {}}
+const OrderXProductValidator = {
+  validate: function (model) {
+    return pass
+  },
+  validateSubset: function () {
+    return pass
+  }
+}
 
 
 module.exports = {
