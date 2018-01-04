@@ -177,6 +177,9 @@ WidgetCategorySchema.pre('remove', function(next) {
   next()
 })
 
+WidgetCategorySchema.index({parentId: 1, widgetCategory: 1}, {unique: true})
+WidgetCategoryOptionSchema.index({parentId: 1, widgetCategoryOption: 1}, {unique: true})
+
 WidgetAttributeSchema.pre('remove', function(next) {
   WidgetXWidgetAttribute.remove({widgetAttributeId: this._id}).exec()
   next()
