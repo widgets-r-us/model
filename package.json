@@ -1,5 +1,5 @@
 {
-  "name": "@widgets-r-us/model",
+  "widgetName": "@widgets-r-us/model",
   "author": "ajmed",
   "license": "MIT",
   "version": "1.1.27",
@@ -10,7 +10,7 @@
     "start": "start-dev-db.sh"
   },
   "dependencies": {
-    "mongoose": "^4.13.7",
+    "mongoose": "^4.13.8",
     "mongoose-paginate": "^5.0.3",
     "uuid": "^3.1.0",
     "validator": "^9.2.0"

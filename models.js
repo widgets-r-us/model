@@ -10,18 +10,18 @@ var Validators = require('./validators')
  * -- are singular
  * -- are PascalCase
  * --- I understand some databases aren't case-sensitive, but this is a necessary evil to have the same variable
- *     names in code as we have in the database. If they represent the same data, it's nice to have the same name.
+ *     names in code as we have in the database. If they represent the same data, it's nice to have the same widgetName.
  * - Key/Column names:
  * -- are singular
  * -- are camelCase
  * - Junction tables are a combination of both table names appended one after another in alphabetical order, separated by an X.
  * -- Example, junction table between Product & Order = OrderXProduct
  * - Names should be descriptive to avoid collision in the future. Instead of naming the WidgetAttribute just
- * Attribute, we name it WidgetAttribute. If, later, we figure out it really is just an Attribute that can apply to
+ * Attribute, we widgetName it WidgetAttribute. If, later, we figure out it really is just an Attribute that can apply to
  * more than just widgets, we can handle it then. It's better to start with a more limited scope and have to make it
  * broader than making a broad scope and having it collide with something else.
- * -- Don't worry too much about table name length. Brevity is nice, but if we can't accomplish this while also being
- *    descriptive, we shouldn't mind a longer name.
+ * -- Don't worry too much about table widgetName length. Brevity is nice, but if we can't accomplish this while also being
+ *    descriptive, we shouldn't mind a longer widgetName.
  */
 
 /**
@@ -46,19 +46,19 @@ var WidgetsRUsErrorSchema = new Schema({
  *        don't want to require a Product be a widget. As such, a widget will have a UUID which the products table
  *        can reference. That way, in the future, a product can be anything that has a UUID as its 'primary key,' and
  *        not only a widget.
- * @key name: String - represents the name of this widget, generally a combination of its type, finish, and size.
+ * @key widgetName: String - represents the widgetName of this widget, generally a combination of its type, finish, and size.
  */
 var WidgetSchema = new Schema({
   _id: {type: String, default: uuid },
-  name: String
+  widgetName: String
 })
 
 /**
- * @key widgetAttribute: String - represents a user-defined widget attribute. Examples include 'Haunted' or
+ * @key widgetAttributeForm: String - represents a user-defined widget attribute. Examples include 'Haunted' or
  *        'Crawling with critters.'
  */
 var WidgetAttributeSchema = new Schema({
-  widgetAttribute: String
+  widgetAttributeName: {type: String, unique: true}
 })
 
 /**
@@ -66,32 +66,32 @@ var WidgetAttributeSchema = new Schema({
  * and Attributes can be attached to many Widget.
  *
  * @key widgetAttributeId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetAttribute table.
- * @key widgetId: Mongoose.Schema.Types.ObjectId - foreign key to Widget table.
+ * @key widgetId: String - foreign key to Widget table.
  */
 var WidgetXWidgetAttributeSchema = new Schema({
-  widgetId: {type: Schema.Types.ObjectId, ref: 'Widget'},
+  widgetId: {type: String, ref: 'Widget'},
   widgetAttributeId: {type: Schema.Types.ObjectId, ref: 'WidgetAttribute'},
 })
 
 /**
  * @key parentId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategory table. Think of this field
  *        as the parent of this category.
- * @key widgetCategory: String - represents the widget category. Examples include Size, Finish, Type, Texture, etc.
+ * @key widgetCategoryName: String - represents the widget category. Examples include Size, Finish, Type, Texture, etc.
  */
 var WidgetCategorySchema = new Schema({
   parentId: {type: Schema.Types.ObjectId, ref: 'WidgetCategory'},
-  widgetCategory: String
+  widgetCategoryName: String
 })
 
 /**
  * @key parentId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategory table. Think of this field
  *        as the parent of this option.
- * @key widgetCategoryOption: String - represents an option for the widget category. Examples include:
- *        let widgetCategory = scent, widgetCategoryOption might be sweet, fruity, pungent, musky.
+ * @key widgetCategoryOptionName: String - represents an option for the widget category. Examples include:
+ *        let widgetCategoryName = scent, widgetCategoryOptionName might be sweet, fruity, pungent, musky.
  */
 var WidgetCategoryOptionSchema = new Schema({
   parentId: {type: Schema.Types.ObjectId, ref: 'WidgetCategory'},
-  widgetCategoryOption: String
+  widgetCategoryOptionName: String
 })
 
 /**
@@ -100,15 +100,15 @@ var WidgetCategoryOptionSchema = new Schema({
  * and following the associated parentId.
  *
  * @key widgetsId: Mongoose.Schema.Types.ObjectId - foreign key to Widget table.
- * @key widgetCategoryOptionId: Mongoose.Schema.Types.ObjectId - foreign key to WidgetCategoryOption table.
+ * @key widgetCategoryOptionId: String - foreign key to WidgetCategoryOption table.
  */
 var WidgetXWidgetCategoryOptionSchema = new Schema({
-  widgetId: {type: Schema.Types.ObjectId, ref: 'Widget'},
+  widgetId: {type: String, ref: 'Widget'},
   widgetCategoryOptionId: {type: Schema.Types.ObjectId, ref: 'WidgetCategoryOption'},
 })
 
 /**
- * @key username: String - represents the name of the user in our system.
+ * @key username: String - represents the widgetName of the user in our system.
  *        TODO(ajmed): add authentication, email address, mailing address, billing info, etc.
  */
 var WidgetsRUsUserSchema = new Schema({
@@ -124,14 +124,13 @@ var OrderSchema = new Schema({
 
 /**
  * @key merchandiseId: String - UUID of the merchandise. For now that only includes widgets.
- * @key name: String - represents the name of the product to sell. If the referenced product has a name, we can fallback
- *        to that.
+ * @key productName: String - represents the productName of the product to sell. This value will be listed in the store.
  * @key quantity: Number - The amount we have in stock of this product.
  * @key price: Number - The price of the product.
  */
 var ProductSchema = new Schema({
   merchandiseId: String,
-  name: String,
+  productName: String,
   quantity: Number,
   price: Number,
 })
@@ -149,19 +148,6 @@ var OrderXProductSchema = new Schema({
   quantityToBuy: Number
 })
 
-
-const WidgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
-const Widget = mongoose.model('Widget', WidgetSchema)
-const WidgetAttribute = mongoose.model('WidgetAttribute', WidgetAttributeSchema)
-const WidgetXWidgetAttribute = mongoose.model('WidgetXWidgetAttribute', WidgetXWidgetAttributeSchema)
-const WidgetCategory = mongoose.model('WidgetCategory', WidgetCategorySchema)
-const WidgetCategoryOption = mongoose.model('WidgetCategoryOption', WidgetCategoryOptionSchema)
-const WidgetXWidgetCategoryOption = mongoose.model('WidgetXWidgetCategoryOption', WidgetXWidgetCategoryOptionSchema)
-const WidgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
-const Product = mongoose.model('Product', ProductSchema)
-const Order = mongoose.model('Order', OrderSchema)
-const OrderXProduct = mongoose.model('OrderXProduct', OrderXProductSchema)
-
 WidgetSchema.plugin(mongoosePaginate)
 
 WidgetCategoryOptionSchema.pre('remove', function(next) {
@@ -177,8 +163,8 @@ WidgetCategorySchema.pre('remove', function(next) {
   next()
 })
 
-WidgetCategorySchema.index({parentId: 1, widgetCategory: 1}, {unique: true})
-WidgetCategoryOptionSchema.index({parentId: 1, widgetCategoryOption: 1}, {unique: true})
+WidgetCategorySchema.index({parentId: 1, widgetCategoryName: 1}, {unique: true})
+WidgetCategoryOptionSchema.index({parentId: 1, widgetCategoryOptionName: 1}, {unique: true})
 
 WidgetAttributeSchema.pre('remove', function(next) {
   WidgetXWidgetAttribute.remove({widgetAttributeId: this._id}).exec()
@@ -201,6 +187,19 @@ WidgetsRUsUserSchema.pre('remove', function(next) {
   Order.remove({widgetsRUsUserId: this._id}).exec()
   next()
 })
+
+// Define the model objects using the schemas
+const WidgetsRUsError = mongoose.model('WidgetsRUsError', WidgetsRUsErrorSchema)
+const Widget = mongoose.model('Widget', WidgetSchema)
+const WidgetAttribute = mongoose.model('WidgetAttribute', WidgetAttributeSchema)
+const WidgetXWidgetAttribute = mongoose.model('WidgetXWidgetAttribute', WidgetXWidgetAttributeSchema)
+const WidgetCategory = mongoose.model('WidgetCategory', WidgetCategorySchema)
+const WidgetCategoryOption = mongoose.model('WidgetCategoryOption', WidgetCategoryOptionSchema)
+const WidgetXWidgetCategoryOption = mongoose.model('WidgetXWidgetCategoryOption', WidgetXWidgetCategoryOptionSchema)
+const WidgetsRUsUser = mongoose.model('WidgetsRUsUser', WidgetsRUsUserSchema)
+const Product = mongoose.model('Product', ProductSchema)
+const Order = mongoose.model('Order', OrderSchema)
+const OrderXProduct = mongoose.model('OrderXProduct', OrderXProductSchema)
 
 module.exports = {
   WidgetsRUsError: WidgetsRUsError,
